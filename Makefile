@@ -4,15 +4,17 @@ DIR_GUARD=@mkdir -p $(@D)
 SRC=en
 TGT=de
 
-all: allpairs
+all: plots
 
 download/wmt19-submitted-data-v3-txt-minimal.tgz : 
 	$(DIR_GUARD)
 	curl 'http://ufallab.ms.mff.cuni.cz/~bojar/wmt19/wmt19-submitted-data-v3-txt-minimal.tgz' --output $@
 
+# we remove online-B for gu-en as it has not been listed in the proceedings and later messes up correlation with HE.
 download/wmt19-submitted-data-v3/txt/system-outputs/newstest2019 : download/wmt19-submitted-data-v3-txt-minimal.tgz
 	$(DIR_GUARD)
-	cd $(dir $<); tar -xzf $(notdir $<)
+	cd $(dir $<); tar -xzf $(notdir $<); 
+	rm download/wmt19-submitted-data-v3/txt/system-outputs/newstest2019/gu-en/newstest2019.online-B.0.gu-en
 
 download/wmt19-submitted-data-v3/txt/system-outputs/newstest2019/$(SRC)-$(TRG) : download/wmt19-submitted-data-v3/txt/system-outputs/newstest2019 
 
@@ -40,33 +42,58 @@ results/wmt19.$(SRC)-$(TGT).ttr.txt : data/wmt19/$(SRC)-$(TGT) data/wmt19/$(SRC)
 		cat $$output | perl scripts/ttr.pl $(TGT); \
 	done | perl -pe 's/data\/wmt19\/$(SRC)-$(TGT)\/newstest2019.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
-results/wmt19.$(SRC)-$(TGT).%.cor.txt : results/wmt19.$(SRC)-$(TGT).%.txt human-eval/ad-sys-ranking-$(SRC)-$(TGT)-z.csv
-	paste <(sort -k1,1 $(word 1, $^)) <(sort -k5,5 $(word 2, $^)) -d ' ' | grep -v task | cut -f 2,4 -d ' ' | perl scripts/correlation.pl > $@
+results/wmt19.$(SRC)-$(TGT).%.scatter1: results/wmt19.$(SRC)-$(TGT).%.txt human-eval/ad-sys-ranking-$(SRC)-$(TGT)-z.csv
+	paste <(sort -k1,1 results/wmt19.$(SRC)-$(TGT).$*.txt) <(sort -k5,5 human-eval/ad-sys-ranking-$(SRC)-$(TGT)-z.csv) -d ' ' | grep -v task | cut -f 2,4 -d ' ' > $@
 
-results.wmt19.$(SRC)-$(TGT): \
+
+results/wmt19.$(SRC)-$(TGT).%.scatter2: results/wmt19.$(SRC)-$(TGT).%.txt human-eval/ad-sys-ranking-$(SRC)-$(TGT)-z.csv
+	paste <(sort -k1,1 results/wmt19.$(SRC)-$(TGT).$*.txt | grep -v HUMAN) <(sort -k5,5 human-eval/ad-sys-ranking-$(SRC)-$(TGT)-z.csv) -d ' ' | grep -v task | cut -f 2,4 -d ' ' > $@
+
+results1.wmt19.$(SRC)-$(TGT): \
 	results/wmt19.$(SRC)-$(TGT).mtld.txt \
-	results/wmt19.$(SRC)-$(TGT).mtld.cor.txt \
+	results/wmt19.$(SRC)-$(TGT).mtld.scatter1 \
 	results/wmt19.$(SRC)-$(TGT).ttr.txt \
-	results/wmt19.$(SRC)-$(TGT).ttr.cor.txt
+	results/wmt19.$(SRC)-$(TGT).ttr.scatter1
+
+results2.wmt19.$(SRC)-$(TGT): \
+	results/wmt19.$(SRC)-$(TGT).mtld.txt \
+	results/wmt19.$(SRC)-$(TGT).mtld.scatter2 \
+	results/wmt19.$(SRC)-$(TGT).ttr.txt \
+	results/wmt19.$(SRC)-$(TGT).ttr.scatter2
 
 clean:
 	rm -rf download data results
 
-onepair: results.wmt19.$(SRC)-$(TGT)
+onePairWithHE: results1.wmt19.$(SRC)-$(TGT)
+
+onePairWithoutHE: results2.wmt19.$(SRC)-$(TGT)
 
 allpairs: download/wmt19-submitted-data-v3/txt/system-outputs/newstest2019
-	$(MAKE) onepair SRC=de TGT=en
-	$(MAKE) onepair SRC=en TGT=cs
-	$(MAKE) onepair SRC=en TGT=de
-	$(MAKE) onepair SRC=en TGT=fi
-	$(MAKE) onepair SRC=en TGT=gu
-	$(MAKE) onepair SRC=en TGT=kk
-	$(MAKE) onepair SRC=en TGT=lt
-	$(MAKE) onepair SRC=en TGT=ru
-	$(MAKE) onepair SRC=en TGT=zh
-	$(MAKE) onepair SRC=fi TGT=en
-	$(MAKE) onepair SRC=gu TGT=en
-	$(MAKE) onepair SRC=lt TGT=en
-	$(MAKE) onepair SRC=ru TGT=en
-	$(MAKE) onepair SRC=kk TGT=en
-	$(MAKE) onepair SRC=zh TGT=en
+	$(MAKE) onePairWithHE SRC=de TGT=en
+	$(MAKE) onePairWithHE SRC=en TGT=cs
+	$(MAKE) onePairWithHE SRC=en TGT=de
+	$(MAKE) onePairWithHE SRC=en TGT=fi
+	$(MAKE) onePairWithHE SRC=en TGT=gu
+	$(MAKE) onePairWithHE SRC=en TGT=lt
+	$(MAKE) onePairWithHE SRC=en TGT=ru
+	$(MAKE) onePairWithHE SRC=en TGT=zh
+	$(MAKE) onePairWithoutHE SRC=fi TGT=en
+	$(MAKE) onePairWithoutHE SRC=gu TGT=en
+	$(MAKE) onePairWithoutHE SRC=lt TGT=en
+	$(MAKE) onePairWithoutHE SRC=ru TGT=en
+	$(MAKE) onePairWithoutHE SRC=kk TGT=en
+	$(MAKE) onePairWithoutHE SRC=zh TGT=en
+
+results/fig1.mtld.png : allpairs
+	python3 scripts/boxplot.py $@ results/wmt19.*.mtld.txt
+
+results/fig1.ttr.png : allpairs
+	python3 scripts/boxplot.py $@ results/wmt19.*.ttr.txt
+
+results/fig2.ttr.png : allpairs
+	python3 scripts/corplot.py $@ results/wmt19.*.ttr.scatter[12]
+
+results/fig2.mtld.png : allpairs
+	python3 scripts/corplot.py $@ results/wmt19.*.mtld.scatter[12]
+
+plots: results/fig1.ttr.png results/fig1.mtld.png results/fig2.ttr.png results/fig2.mtld.png

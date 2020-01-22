@@ -10,20 +10,24 @@ plt.rc('axes', titlesize=12)
 dataAll = []
 human   = []
 labels  = []
-for path in sys.argv[1:]:
+
+mtld = False
+
+for path in sys.argv[2:]:
+    print(path)
     labels.append(path.split(".")[1])
+    if "mtld" in path:
+        mtld = True
     with open(path) as file:
         data = []
         for line in file:
             line = line.rstrip("\n")
-            (sys, score) = line.split(" ")
-            if sys == "HUMAN":
+            (system, score) = line.split(" ")
+            if system == "HUMAN":
                 human.append(float(score))
             else:
                 data.append(float(score))
         dataAll.append(np.array(data))
-
-print(dataAll)
 
 # plot with various axes scales
 
@@ -33,16 +37,15 @@ fig, axes = plt.subplots(2, cols, figsize=(18, 12), dpi=75, facecolor='w', edgec
 if len(labels) % 2 == 1:
     axes[-1, -1].axis('off')
 
-
-print(cols)
-print(labels)
 for i in range(len(labels)):
     x = int(i / cols)
     y = int(i % cols)
-    print(i, x,y)
     axes[x, y].boxplot(dataAll[i], whis=10000, widths = 0.6)
     axes[x, y].set_xticklabels([labels[i]])
     axes[x, y].scatter(x=1, y=human[i], c="red", s=100)
-    axes[x, y].yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+    if mtld:
+        axes[x, y].yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+    else:
+        axes[x, y].yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
-fig.savefig('fig1.png', bbox_inches='tight')
+fig.savefig(sys.argv[1], bbox_inches='tight')
