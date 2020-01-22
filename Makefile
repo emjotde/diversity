@@ -22,9 +22,9 @@ data/wmt19/$(SRC)-$(TGT) : download/wmt19-submitted-data-v3/txt/system-outputs/n
 	$(DIR_GUARD)
 	cp -rf $^ $@
 
-data/wmt19/$(SRC)-$(TGT)/newstest2019.HUMAN.$(SRC)-$(TGT) : download/wmt19-submitted-data-v3/txt/references/newstest2019-$(SRC)$(TGT)-ref.$(TGT) data/wmt19/$(SRC)-$(TGT)
+data/wmt19/$(SRC)-$(TGT)/newstest2019.HUMAN.$(SRC)-$(TGT) : download/wmt19-submitted-data-v3/txt/system-outputs/newstest2019 data/wmt19/$(SRC)-$(TGT)
 	$(DIR_GUARD)
-	cp -rf $< $@
+	cp -rf download/wmt19-submitted-data-v3/txt/references/newstest2019-$(SRC)$(TGT)-ref.$(TGT) $@
 
 results/wmt19.$(SRC)-$(TGT).mtld.txt : data/wmt19/$(SRC)-$(TGT) data/wmt19/$(SRC)-$(TGT)/newstest2019.HUMAN.$(SRC)-$(TGT)
 	$(DIR_GUARD)
@@ -97,3 +97,92 @@ results/fig2.mtld.png : allpairs
 	python3 scripts/corplot.py $@ results/wmt19.*.mtld.scatter[12]
 
 plots: results/fig1.ttr.png results/fig1.mtld.png results/fig2.ttr.png results/fig2.mtld.png
+
+#################################################################################################################################################################################
+# Historic stuff over time
+
+### WMT15 ####################################################################################
+
+download/wmt15-submitted-data.tgz : 
+	$(DIR_GUARD)
+	curl 'http://www.statmt.org/wmt15/wmt15-submitted-data.tgz' --output $@
+
+# we remove online-B for gu-en as it has not been listed in the proceedings and later messes up correlation with HE.
+download/wmt15-submitted-data/txt/system-outputs/newstest2015 : download/wmt15-submitted-data.tgz
+	$(DIR_GUARD)
+	cd $(dir $<); tar -xzf $(notdir $<); 
+
+download/wmt15-submitted-data/txt/system-outputs/newstest2015/$(SRC)-$(TGT) : download/wmt15-submitted-data/txt/system-outputs/newstest2015 
+
+data/wmt15/$(SRC)-$(TGT) : download/wmt15-submitted-data/txt/system-outputs/newstest2015/$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	cp -rf $^ $@
+
+data/wmt15/$(SRC)-$(TGT)/newstest2015.HUMAN.$(SRC)-$(TGT) : download/wmt15-submitted-data/txt/system-outputs/newstest2015 data/wmt15/$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	cp -rf download/wmt15-submitted-data/txt/references/newstest2015-$(SRC)$(TGT)-ref.$(TGT) $@
+
+### WMT16 ####################################################################################
+
+download/wmt16-submitted-data-v2.tgz : 
+	$(DIR_GUARD)
+	curl 'http://data.statmt.org/wmt16/translation-task/wmt16-submitted-data-v2.tgz' --output $@
+
+# we remove online-B for gu-en as it has not been listed in the proceedings and later messes up correlation with HE.
+download/wmt16-submitted-data/txt/system-outputs/newstest2016 : download/wmt16-submitted-data-v2.tgz
+	$(DIR_GUARD)
+	cd $(dir $<); tar -xzf $(notdir $<); 
+
+download/wmt16-submitted-data/txt/system-outputs/newstest2016/$(SRC)-$(TGT) : download/wmt16-submitted-data/txt/system-outputs/newstest2016
+
+data/wmt16/$(SRC)-$(TGT) : download/wmt16-submitted-data/txt/system-outputs/newstest2016/$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	cp -rf $^ $@
+
+data/wmt16/$(SRC)-$(TGT)/newstest2016.HUMAN.$(SRC)-$(TGT) : download/wmt16-submitted-data/txt/system-outputs/newstest2016 data/wmt16/$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	cp -rf download/wmt16-submitted-data/txt/references/newstest2016-$(SRC)$(TGT)-ref.$(TGT) $@
+
+### WMT17 ####################################################################################
+
+download/wmt17-submitted-data-v1.0.tgz : 
+	$(DIR_GUARD)
+	curl 'http://data.statmt.org/wmt17/translation-task/wmt17-submitted-data-v1.0.tgz' --output $@
+
+# we remove online-B for gu-en as it has not been listed in the proceedings and later messes up correlation with HE.
+download/wmt17-submitted-data/txt/system-outputs/newstest2017 : download/wmt17-submitted-data-v1.0.tgz
+	$(DIR_GUARD)
+	cd $(dir $<); tar -xzf $(notdir $<); 
+
+download/wmt17-submitted-data/txt/system-outputs/newstest2017/$(SRC)-$(TGT) : download/wmt17-submitted-data/txt/system-outputs/newstest2017
+
+data/wmt17/$(SRC)-$(TGT) : download/wmt17-submitted-data/txt/system-outputs/newstest2017/$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	cp -rf download/wmt17-submitted-data/txt/references/newstest2017-$(SRC)$(TGT)-ref.$(TGT) $^ $@
+
+data/wmt17/$(SRC)-$(TGT)/newstest2017.HUMAN.$(SRC)-$(TGT) : download/wmt17-submitted-data/txt/system-outputs/newstest2017 data/wmt17/$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	cp -rf download/wmt17-submitted-data/txt/references/newstest2017-$(SRC)$(TGT)-ref.$(TGT) $@
+
+### WMT18 ####################################################################################
+
+download/wmt18-submitted-data-v1.0.1.tgz : 
+	$(DIR_GUARD)
+	curl 'http://data.statmt.org/wmt18/translation-task/wmt18-submitted-data-v1.0.1.tgz' --output $@
+
+# we remove online-B for gu-en as it has not been listed in the proceedings and later messes up correlation with HE.
+download/wmt18-submitted-data/txt/system-outputs/newstest2018 : download/wmt18-submitted-data-v1.0.1.tgz
+	$(DIR_GUARD)
+	cd $(dir $<); tar -xzf $(notdir $<); 
+
+download/wmt18-submitted-data/txt/system-outputs/newstest2018/$(SRC)-$(TGT) : download/wmt18-submitted-data/txt/system-outputs/newstest2018
+
+data/wmt18/$(SRC)-$(TGT) : download/wmt18-submitted-data/txt/system-outputs/newstest2018/$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	cp -rf download/wmt18-submitted-data/txt/references/newstest2018-$(SRC)$(TGT)-ref.$(TGT) $@
+
+data/wmt18/$(SRC)-$(TGT)/newstest2018.HUMAN.$(SRC)-$(TGT) : download/wmt18-submitted-data/txt/system-outputs/newstest2018 data/wmt18/$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	cp -rf download/wmt18-submitted-data/txt/references/newstest2018-$(SRC)$(TGT)-ref.$(TGT) $@
+
+
