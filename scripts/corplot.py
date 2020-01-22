@@ -13,9 +13,10 @@ human   = []
 labels  = []
 
 mtld = False
-
-for path in sys.argv[2:]:
+ref = dict()
+for i, path in enumerate(sys.argv[2:]):
     labels.append(path.split(".")[1])
+    print(path)
     if "mtld" in path:
         mtld = True
     with open(path) as file:
@@ -23,9 +24,11 @@ for path in sys.argv[2:]:
         y = []
         for line in file:
             line = line.rstrip("\n")
-            (ld, he) = line.split(" ")
+            (label, ld, he) = line.split(" ")
             x.append(float(he))
             y.append(float(ld))
+            if "HUMAN" in label:
+                ref[i] = [float(he), float(ld)]
         dataAll.append([x, y])
 
 # plot with various axes scales
@@ -40,7 +43,7 @@ for i in range(1, missing + 1):
 for i in range(len(labels)):
     x = int(i / cols)
     y = int(i % cols)
-    axes[x, y].scatter(x=dataAll[i][0], y=dataAll[i][1], c="red")
+    axes[x, y].scatter(x=dataAll[i][0], y=dataAll[i][1], c="green")
 
     gradient, intercept, r_value, p_value, std_err = stats.linregress(dataAll[i][0], dataAll[i][1])
     mn=np.min(dataAll[i][0])
@@ -49,6 +52,9 @@ for i in range(len(labels)):
     y1=gradient*x1+intercept
 
     axes[x, y].plot(x1,y1,'-r', c="blue")
+
+    if i in ref:
+        axes[x, y].scatter(x=[ref[i][0]], y=[ref[i][1]], c="red")
 
     axes[x, y].set_xlabel(labels[i])
     if mtld:
