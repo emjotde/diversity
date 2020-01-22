@@ -67,20 +67,62 @@ onePairWithHE: results1.wmt19.$(SRC)-$(TGT)
 
 onePairWithoutHE: results2.wmt19.$(SRC)-$(TGT)
 
-allpairs: download/wmt19-submitted-data-v3/done
+allpairs: \
+	onePairWithHE_SRC_de_TGT_en \
+	onePairWithHE_SRC_en_TGT_cs \
+	onePairWithHE_SRC_en_TGT_de \
+	onePairWithHE_SRC_en_TGT_fi \
+	onePairWithHE_SRC_en_TGT_gu \
+	onePairWithHE_SRC_en_TGT_lt \
+	onePairWithHE_SRC_en_TGT_ru \
+	onePairWithHE_SRC_en_TGT_zh \
+	onePairWithoutHE_SRC_fi_TGT_en \
+	onePairWithoutHE_SRC_gu_TGT_en \
+	onePairWithoutHE_SRC_lt_TGT_en \
+	onePairWithoutHE_SRC_ru_TGT_en \
+	onePairWithoutHE_SRC_kk_TGT_en \
+	onePairWithoutHE_SRC_zh_TGT_en
+
+onePairWithHE_SRC_de_TGT_en: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithHE SRC=de TGT=en
+
+onePairWithHE_SRC_en_TGT_cs: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithHE SRC=en TGT=cs
+
+onePairWithHE_SRC_en_TGT_de: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithHE SRC=en TGT=de
+
+onePairWithHE_SRC_en_TGT_fi: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithHE SRC=en TGT=fi
+
+onePairWithHE_SRC_en_TGT_gu: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithHE SRC=en TGT=gu
+
+onePairWithHE_SRC_en_TGT_lt: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithHE SRC=en TGT=lt
+
+onePairWithHE_SRC_en_TGT_ru: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithHE SRC=en TGT=ru
+
+onePairWithHE_SRC_en_TGT_zh: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithHE SRC=en TGT=zh
+
+onePairWithoutHE_SRC_fi_TGT_en: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithoutHE SRC=fi TGT=en
+
+onePairWithoutHE_SRC_gu_TGT_en: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithoutHE SRC=gu TGT=en
+
+onePairWithoutHE_SRC_lt_TGT_en: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithoutHE SRC=lt TGT=en
+
+onePairWithoutHE_SRC_ru_TGT_en: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithoutHE SRC=ru TGT=en
+
+onePairWithoutHE_SRC_kk_TGT_en: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithoutHE SRC=kk TGT=en
+
+onePairWithoutHE_SRC_zh_TGT_en: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithoutHE SRC=zh TGT=en
 
 results/fig1.mtld.png : allpairs
