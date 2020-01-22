@@ -158,7 +158,7 @@ download/wmt17-submitted-data/txt/system-outputs/newstest2017/$(SRC)-$(TGT) : do
 
 data/wmt17/$(SRC)-$(TGT) : download/wmt17-submitted-data/txt/system-outputs/newstest2017/$(SRC)-$(TGT)
 	$(DIR_GUARD)
-	cp -rf download/wmt17-submitted-data/txt/references/newstest2017-$(SRC)$(TGT)-ref.$(TGT) $^ $@
+	cp -rf $^ $@
 
 data/wmt17/$(SRC)-$(TGT)/newstest2017.HUMAN.$(SRC)-$(TGT) : download/wmt17-submitted-data/txt/system-outputs/newstest2017 data/wmt17/$(SRC)-$(TGT)
 	$(DIR_GUARD)
@@ -179,10 +179,16 @@ download/wmt18-submitted-data/txt/system-outputs/newstest2018/$(SRC)-$(TGT) : do
 
 data/wmt18/$(SRC)-$(TGT) : download/wmt18-submitted-data/txt/system-outputs/newstest2018/$(SRC)-$(TGT)
 	$(DIR_GUARD)
-	cp -rf download/wmt18-submitted-data/txt/references/newstest2018-$(SRC)$(TGT)-ref.$(TGT) $@
+	cp -rf $^ $@
 
 data/wmt18/$(SRC)-$(TGT)/newstest2018.HUMAN.$(SRC)-$(TGT) : download/wmt18-submitted-data/txt/system-outputs/newstest2018 data/wmt18/$(SRC)-$(TGT)
 	$(DIR_GUARD)
 	cp -rf download/wmt18-submitted-data/txt/references/newstest2018-$(SRC)$(TGT)-ref.$(TGT) $@
 
-
+results/wmt18.$(SRC)-$(TGT).ttr.txt : splits/wmt18.$(SRC)$(TGT).split data/wmt18/$(SRC)-$(TGT) data/wmt18/$(SRC)-$(TGT)/newstest2019.HUMAN.$(SRC)-$(TGT)
+	$(DIR_GUARD)
+	for output in data/wmt18/$(SRC)-$(TGT)/*; \
+	do \
+		echo -ne "$$output "; \
+		paste splits/wmt18.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+	done | perl -pe 's/data\/wmt18\/$(SRC)-$(TGT)\/newstest2019.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
