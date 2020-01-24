@@ -1,8 +1,8 @@
 SHELL=/bin/bash
 DIR_GUARD=@mkdir -p $(@D)
 
-SRC=en
-TGT=de
+SRC=de
+TGT=en
 
 .PHONY: clean
 
@@ -31,7 +31,7 @@ results/wmt19.$(SRC)-$(TGT).mtld.txt : data/wmt19/$(SRC)-$(TGT) data/wmt19/$(SRC
 	for output in data/wmt19/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		cat $$output | perl scripts/mtld.pl $(TGT); \
+		cat $$output | perl scripts/mtld.pl $(TGT) counts/news.en.counts download/wmt19-submitted-data-v3/txt/sources/newstest2019-$(SRC)$(TGT)-src.$(SRC) ; \
 	done | grep -v task | perl -pe 's/data\/wmt19\/$(SRC)-$(TGT)\/newstest2019.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
 results/wmt19.$(SRC)-$(TGT).ttr.txt : data/wmt19/$(SRC)-$(TGT) data/wmt19/$(SRC)-$(TGT)/newstest2019.HUMAN.$(SRC)-$(TGT)
@@ -39,7 +39,7 @@ results/wmt19.$(SRC)-$(TGT).ttr.txt : data/wmt19/$(SRC)-$(TGT) data/wmt19/$(SRC)
 	for output in data/wmt19/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		cat $$output | perl scripts/ttr.pl $(TGT); \
+		cat $$output | perl scripts/ttr.pl $(TGT) counts/news.en.counts download/wmt19-submitted-data-v3/txt/sources/newstest2019-$(SRC)$(TGT)-src.$(SRC) ; \
 	done | grep -v task | perl -pe 's/data\/wmt19\/$(SRC)-$(TGT)\/newstest2019.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
 results/wmt19.$(SRC)-$(TGT).%.scatter1: results/wmt19.$(SRC)-$(TGT).%.txt human-eval/ad-sys-ranking-$(SRC)-$(TGT)-z.csv
@@ -222,93 +222,133 @@ data/wmt18/$(SRC)-$(TGT)/newstest2018.HUMAN.$(SRC)-$(TGT) : download/wmt18-submi
 
 #############################################################################################
 
-results/wmt15.$(SRC)-$(TGT).ttr.txt : splits/wmt15.$(SRC)$(TGT).split data/wmt15/$(SRC)-$(TGT) data/wmt15/$(SRC)-$(TGT)/newstest2015.HUMAN.$(SRC)-$(TGT)
+results/newstest2015-$(SRC)$(TGT)-src.$(SRC).fw : download/wmt15-submitted-data/txt/sources/newstest2015-$(SRC)$(TGT)-src.$(SRC) splits/wmt15.$(SRC)$(TGT).split
+	$(DIR_GUARD)
+	paste $(word 2, $^) $(word 1, $^) | grep '^True' | cut -f 2 > $@
+
+results/newstest2016-$(SRC)$(TGT)-src.$(SRC).fw : download/wmt16-submitted-data/txt/sources/newstest2016-$(SRC)$(TGT)-src.$(SRC) splits/wmt16.$(SRC)$(TGT).split
+	$(DIR_GUARD)
+	paste $(word 2, $^) $(word 1, $^) | grep '^True' | cut -f 2 > $@
+
+results/newstest2017-$(SRC)$(TGT)-src.$(SRC).fw : download/wmt17-submitted-data/txt/sources/newstest2017-$(SRC)$(TGT)-src.$(SRC) splits/wmt17.$(SRC)$(TGT).split
+	$(DIR_GUARD)
+	paste $(word 2, $^) $(word 1, $^) | grep '^True' | cut -f 2 > $@
+
+results/newstest2018-$(SRC)$(TGT)-src.$(SRC).fw : download/wmt18-submitted-data/txt/sources/newstest2018-$(SRC)$(TGT)-src.$(SRC) splits/wmt18.$(SRC)$(TGT).split
+	$(DIR_GUARD)
+	paste $(word 2, $^) $(word 1, $^) | grep '^True' | cut -f 2 > $@
+
+results/wmt15.$(SRC)-$(TGT).%.fw.txt : splits/wmt15.$(SRC)$(TGT).split data/wmt15/$(SRC)-$(TGT) data/wmt15/$(SRC)-$(TGT)/newstest2015.HUMAN.$(SRC)-$(TGT) results/newstest2015-$(SRC)$(TGT)-src.$(SRC).fw
 	$(DIR_GUARD)
 	for output in data/wmt15/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		paste splits/wmt15.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+		paste splits/wmt15.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | \
+		perl scripts/$*.pl $(TGT) counts/news.en.counts results/newstest2015-$(SRC)$(TGT)-src.$(SRC).fw; \
 	done | perl -pe 's/data\/wmt15\/$(SRC)-$(TGT)\/newstest2015.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
-results/wmt16.$(SRC)-$(TGT).ttr.txt : splits/wmt16.$(SRC)$(TGT).split data/wmt16/$(SRC)-$(TGT) data/wmt16/$(SRC)-$(TGT)/newstest2016.HUMAN.$(SRC)-$(TGT)
+results/wmt16.$(SRC)-$(TGT).%.fw.txt : splits/wmt16.$(SRC)$(TGT).split data/wmt16/$(SRC)-$(TGT) data/wmt16/$(SRC)-$(TGT)/newstest2016.HUMAN.$(SRC)-$(TGT) results/newstest2016-$(SRC)$(TGT)-src.$(SRC).fw
 	$(DIR_GUARD)
 	for output in data/wmt16/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		paste splits/wmt16.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+		paste splits/wmt16.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | \
+		perl scripts/$*.pl $(TGT) counts/news.en.counts results/newstest2016-$(SRC)$(TGT)-src.$(SRC).fw; \
 	done | perl -pe 's/data\/wmt16\/$(SRC)-$(TGT)\/newstest2016.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
-results/wmt17.$(SRC)-$(TGT).ttr.txt : splits/wmt17.$(SRC)$(TGT).split data/wmt17/$(SRC)-$(TGT) data/wmt17/$(SRC)-$(TGT)/newstest2017.HUMAN.$(SRC)-$(TGT)
+results/wmt17.$(SRC)-$(TGT).%.fw.txt : splits/wmt17.$(SRC)$(TGT).split data/wmt17/$(SRC)-$(TGT) data/wmt17/$(SRC)-$(TGT)/newstest2017.HUMAN.$(SRC)-$(TGT) results/newstest2017-$(SRC)$(TGT)-src.$(SRC).fw
 	$(DIR_GUARD)
 	for output in data/wmt17/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		paste splits/wmt17.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+		paste splits/wmt17.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | \
+		perl scripts/$*.pl $(TGT) counts/news.en.counts results/newstest2017-$(SRC)$(TGT)-src.$(SRC).fw; \
 	done | perl -pe 's/data\/wmt17\/$(SRC)-$(TGT)\/newstest2017.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
-results/wmt18.$(SRC)-$(TGT).ttr.txt : splits/wmt18.$(SRC)$(TGT).split data/wmt18/$(SRC)-$(TGT) data/wmt18/$(SRC)-$(TGT)/newstest2018.HUMAN.$(SRC)-$(TGT)
+results/wmt18.$(SRC)-$(TGT).%.fw.txt : splits/wmt18.$(SRC)$(TGT).split data/wmt18/$(SRC)-$(TGT) data/wmt18/$(SRC)-$(TGT)/newstest2018.HUMAN.$(SRC)-$(TGT) results/newstest2018-$(SRC)$(TGT)-src.$(SRC).fw
 	$(DIR_GUARD)
 	for output in data/wmt18/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		paste splits/wmt18.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+		paste splits/wmt18.$(SRC)$(TGT).split <(cat $$output) | grep '^True' | cut -f 2 | \
+		perl scripts/$*.pl $(TGT) counts/news.en.counts results/newstest2018-$(SRC)$(TGT)-src.$(SRC).fw; \
 	done | perl -pe 's/data\/wmt18\/$(SRC)-$(TGT)\/newstest2018.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
 #############################################################################################
 # in wrong direction, reference is native text, via grep -v
 
-results/wmt15.$(SRC)-$(TGT).ttr.inv.txt : splits/wmt15.$(SRC)$(TGT).split data/wmt15/$(SRC)-$(TGT) data/wmt15/$(SRC)-$(TGT)/newstest2015.HUMAN.$(SRC)-$(TGT)
+results/newstest2015-$(SRC)$(TGT)-src.$(SRC).bw : download/wmt15-submitted-data/txt/sources/newstest2015-$(SRC)$(TGT)-src.$(SRC) splits/wmt15.$(SRC)$(TGT).split
+	$(DIR_GUARD)
+	paste $(word 2, $^) $(word 1, $^) | grep -v '^True' | cut -f 2 > $@
+
+results/newstest2016-$(SRC)$(TGT)-src.$(SRC).bw : download/wmt16-submitted-data/txt/sources/newstest2016-$(SRC)$(TGT)-src.$(SRC) splits/wmt16.$(SRC)$(TGT).split
+	$(DIR_GUARD)
+	paste $(word 2, $^) $(word 1, $^) | grep -v '^True' | cut -f 2 > $@
+
+results/newstest2017-$(SRC)$(TGT)-src.$(SRC).bw : download/wmt17-submitted-data/txt/sources/newstest2017-$(SRC)$(TGT)-src.$(SRC) splits/wmt17.$(SRC)$(TGT).split
+	$(DIR_GUARD)
+	paste $(word 2, $^) $(word 1, $^) | grep -v '^True' | cut -f 2 > $@
+
+results/newstest2018-$(SRC)$(TGT)-src.$(SRC).bw : download/wmt18-submitted-data/txt/sources/newstest2018-$(SRC)$(TGT)-src.$(SRC) splits/wmt18.$(SRC)$(TGT).split
+	$(DIR_GUARD)
+	paste $(word 2, $^) $(word 1, $^) | grep -v '^True' | cut -f 2 > $@
+
+results/wmt15.$(SRC)-$(TGT).%.bw.txt : splits/wmt15.$(SRC)$(TGT).split data/wmt15/$(SRC)-$(TGT) data/wmt15/$(SRC)-$(TGT)/newstest2015.HUMAN.$(SRC)-$(TGT) results/newstest2015-$(SRC)$(TGT)-src.$(SRC).bw
 	$(DIR_GUARD)
 	for output in data/wmt15/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		paste splits/wmt15.$(SRC)$(TGT).split <(cat $$output) | grep -v '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+		paste splits/wmt15.$(SRC)$(TGT).split $$output | grep -v '^True' | cut -f 2 | \
+		perl scripts/$*.pl $(TGT) counts/news.en.counts  results/newstest2015-$(SRC)$(TGT)-src.$(SRC).bw; \
 	done | perl -pe 's/data\/wmt15\/$(SRC)-$(TGT)\/newstest2015.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
-results/wmt16.$(SRC)-$(TGT).ttr.inv.txt : splits/wmt16.$(SRC)$(TGT).split data/wmt16/$(SRC)-$(TGT) data/wmt16/$(SRC)-$(TGT)/newstest2016.HUMAN.$(SRC)-$(TGT)
+results/wmt16.$(SRC)-$(TGT).%.bw.txt : splits/wmt16.$(SRC)$(TGT).split data/wmt16/$(SRC)-$(TGT) data/wmt16/$(SRC)-$(TGT)/newstest2016.HUMAN.$(SRC)-$(TGT) results/newstest2016-$(SRC)$(TGT)-src.$(SRC).bw
 	$(DIR_GUARD)
 	for output in data/wmt16/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		paste splits/wmt16.$(SRC)$(TGT).split <(cat $$output) | grep -v '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+		paste splits/wmt16.$(SRC)$(TGT).split $$output | grep -v '^True' | cut -f 2 | \
+		perl scripts/$*.pl $(TGT) counts/news.en.counts results/newstest2016-$(SRC)$(TGT)-src.$(SRC).bw; \
 	done | perl -pe 's/data\/wmt16\/$(SRC)-$(TGT)\/newstest2016.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
-results/wmt17.$(SRC)-$(TGT).ttr.inv.txt : splits/wmt17.$(SRC)$(TGT).split data/wmt17/$(SRC)-$(TGT) data/wmt17/$(SRC)-$(TGT)/newstest2017.HUMAN.$(SRC)-$(TGT)
+results/wmt17.$(SRC)-$(TGT).%.bw.txt : splits/wmt17.$(SRC)$(TGT).split data/wmt17/$(SRC)-$(TGT) data/wmt17/$(SRC)-$(TGT)/newstest2017.HUMAN.$(SRC)-$(TGT) results/newstest2017-$(SRC)$(TGT)-src.$(SRC).bw
 	$(DIR_GUARD)
 	for output in data/wmt17/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		paste splits/wmt17.$(SRC)$(TGT).split <(cat $$output) | grep -v '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+		paste splits/wmt17.$(SRC)$(TGT).split $$output | grep -v '^True' | cut -f 2 | \
+		perl scripts/$*.pl $(TGT) counts/news.en.counts results/newstest2017-$(SRC)$(TGT)-src.$(SRC).bw; \
 	done | perl -pe 's/data\/wmt17\/$(SRC)-$(TGT)\/newstest2017.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
-results/wmt18.$(SRC)-$(TGT).ttr.inv.txt : splits/wmt18.$(SRC)$(TGT).split data/wmt18/$(SRC)-$(TGT) data/wmt18/$(SRC)-$(TGT)/newstest2018.HUMAN.$(SRC)-$(TGT)
+results/wmt18.$(SRC)-$(TGT).%.bw.txt : splits/wmt18.$(SRC)$(TGT).split data/wmt18/$(SRC)-$(TGT) data/wmt18/$(SRC)-$(TGT)/newstest2018.HUMAN.$(SRC)-$(TGT) results/newstest2018-$(SRC)$(TGT)-src.$(SRC).bw
 	$(DIR_GUARD)
 	for output in data/wmt18/$(SRC)-$(TGT)/*; \
 	do \
 		echo -ne "$$output "; \
-		paste splits/wmt18.$(SRC)$(TGT).split <(cat $$output) | grep -v '^True' | cut -f 2 | perl scripts/ttr.pl $(TGT); \
+		paste splits/wmt18.$(SRC)$(TGT).split $$output | grep -v '^True' | cut -f 2 | \
+		perl scripts/$*.pl $(TGT) counts/news.en.counts results/newstest2018-$(SRC)$(TGT)-src.$(SRC).bw; \
 	done | perl -pe 's/data\/wmt18\/$(SRC)-$(TGT)\/newstest2018.(.+)\.[^\.]+ /$$1 /g' | sort -k2,2gr > $@
 
 
-results.over.time: \
-	results/wmt15.$(SRC)-$(TGT).ttr.txt \
-	results/wmt16.$(SRC)-$(TGT).ttr.txt \
-	results/wmt17.$(SRC)-$(TGT).ttr.txt \
-	results/wmt18.$(SRC)-$(TGT).ttr.txt \
-	results/wmt15.$(SRC)-$(TGT).ttr.inv.txt \
-	results/wmt16.$(SRC)-$(TGT).ttr.inv.txt \
-	results/wmt17.$(SRC)-$(TGT).ttr.inv.txt \
-	results/wmt18.$(SRC)-$(TGT).ttr.inv.txt
+results/fig3.%.fw.png : \
+  results/wmt15.$(SRC)-$(TGT).%.fw.txt \
+  results/wmt16.$(SRC)-$(TGT).%.fw.txt \
+  results/wmt17.$(SRC)-$(TGT).%.fw.txt \
+  results/wmt18.$(SRC)-$(TGT).%.fw.txt \
+  results/wmt19.$(SRC)-$(TGT).%.txt
+	python3 scripts/boxplot.time.py $@ $^
 
-results/fig3.ttr.png : allpairs results.over.time
-	python3 scripts/boxplot.time.py $@ results/wmt1[56789].$(SRC)-$(TGT).ttr.txt
-
-results/fig3.ttr.inv.png : allpairs results.over.time
-	python3 scripts/boxplot.time.py $@ results/wmt1[5678].$(SRC)-$(TGT).ttr.inv.txt
+results/fig3.%.bw.png : \
+  results/wmt15.$(SRC)-$(TGT).%.bw.txt \
+  results/wmt16.$(SRC)-$(TGT).%.bw.txt \
+  results/wmt17.$(SRC)-$(TGT).%.bw.txt \
+  results/wmt18.$(SRC)-$(TGT).%.bw.txt
+	python3 scripts/boxplot.time.py $@ $^
 
 #####################################################################################################
 
 plots: \
     results/fig1.ttr.png results/fig1.mtld.png \
 	results/fig2.ttr.png results/fig2.mtld.png \
-	results/fig3.ttr.png results/fig3.ttr.inv.png
+	results/fig3.ttr.fw.png results/fig3.ttr.bw.png \
+	results/fig3.mtld.fw.png results/fig3.mtld.bw.png

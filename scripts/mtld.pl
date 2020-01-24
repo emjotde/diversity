@@ -4,6 +4,35 @@ binmode(STDIN,  ":utf8");
 binmode(STDOUT, ":utf8");
 
 my $LANG = $ARGV[0];
+my $WORDS = $ARGV[1];
+my $SOURCE = $ARGV[2];
+
+my %words;
+my %frequent;
+if(defined($WORDS) and $LANG eq "en") {
+    open(W, "<:utf8", $WORDS);
+    while(<W>) {
+        chomp;
+        my ($w, $c) = split(/\t/, $_);
+        if($c >= 5) {
+            $words{$w} = 1;
+        }
+        if($c > 1000) {
+            $frequent{$w} = 1;
+        }
+    }
+    close(W);
+}
+my @source;
+if(defined($SOURCE)) {
+    open(S, "<:utf8", $SOURCE);
+    while(<S>) {
+        chomp;
+        my @t = /(\p{L}+)/g;
+        push(@source, { map { lc($_) => 1 } @t });
+    }
+    close(S);
+}
 
 sub mtldfw {
     my @tokens = @_;
@@ -56,6 +85,16 @@ while(<STDIN>) {
     my @lineTokens = /(\p{L}+)/g;
     if($LANG eq "zh") {
         @lineTokens = map { if(/[a-z]/) { $_ } else { my @t = /(.)/g; @t } } @lineTokens;
+    }
+
+    # only use words that are not present in the source or that are frequent in the target language despite that
+    if(@source) {
+        @lineTokens = grep { exists($frequent{$_}) or not exists($source[$. - 1]->{$_}) } @lineTokens;
+    }
+
+    # only use words that are seen in the frequency list with occurance 5 and above
+    if(%words) { 
+        @lineTokens = grep { exists($words{$_}) } @lineTokens;
     }
 
     push(@tokens, @lineTokens);
