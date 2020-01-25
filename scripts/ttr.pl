@@ -9,12 +9,14 @@ my $SOURCE = $ARGV[2];
 
 my %words;
 my %frequent;
-if(defined($WORDS) and $LANG eq "en") {
+
+#if(defined($WORDS) and $LANG eq "en") {
+if(defined($WORDS)) {
     open(W, "<:utf8", $WORDS);
     while(<W>) {
         chomp;
         my ($w, $c) = split(/\t/, $_);
-        if($c >= 5) {
+        if($c >= 1) {
             $words{$w} = 1;
         }
         if($c > 1000) {
@@ -59,7 +61,7 @@ while(<STDIN>) {
     # if a word count file is available discard very rare words
     if(%words) { 
         # only use words that are seen in the frequency list with occurance 5 and above
-        # print join("\n", grep { !exists($words{$_}) } @lineTokens), "\n";
+        print join("\n", grep { !exists($words{$_}) } @lineTokens), "\n";
         @lineTokens = grep { exists($words{$_}) } @lineTokens;
     }
 

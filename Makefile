@@ -126,16 +126,16 @@ onePairWithoutHE_SRC_zh_TGT_en: download/wmt19-submitted-data-v3/done
 	$(MAKE) onePairWithoutHE SRC=zh TGT=en
 
 results/fig1.mtld.png : allpairs
-	python3 scripts/boxplot.py $@ results/wmt19.*.mtld.txt
+	python3 scripts/boxplot.py $@ results/wmt19.*-en.mtld.txt results/wmt19.en-*.mtld.txt 
 
 results/fig1.ttr.png : allpairs
-	python3 scripts/boxplot.py $@ results/wmt19.*.ttr.txt
+	python3 scripts/boxplot.py $@ results/wmt19.*-en.ttr.txt results/wmt19.en-*.ttr.txt
 
 results/fig2.ttr.png : allpairs
-	python3 scripts/corplot.py $@ results/wmt19.*.ttr.scatter[12]
+	python3 scripts/corplot.py $@ results/wmt19.*-en.ttr.scatter[12] results/wmt19.en-*.ttr.scatter[12]
 
 results/fig2.mtld.png : allpairs
-	python3 scripts/corplot.py $@ results/wmt19.*.mtld.scatter[12]
+	python3 scripts/corplot.py $@ results/wmt19.*-en.mtld.scatter[12] results/wmt19.en-*.mtld.scatter[12]
 
 #################################################################################################################################################################################
 # Historic stuff over time

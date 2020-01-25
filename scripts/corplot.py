@@ -32,9 +32,9 @@ for i, path in enumerate(sys.argv[2:]):
         dataAll.append([x, y])
 
 # plot with various axes scales
-rows = 4
+rows = 2
 cols = int(math.ceil(len(labels) / rows))
-fig, axes = plt.subplots(rows, cols, figsize=(16, 16), dpi=75, facecolor='w', edgecolor='k', constrained_layout=True)
+fig, axes = plt.subplots(rows, cols, figsize=(30, 9), dpi=75, facecolor='w', edgecolor='k', constrained_layout=True)
 
 missing = rows * cols - len(labels)
 for i in range(1, missing + 1):
