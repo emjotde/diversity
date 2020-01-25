@@ -87,14 +87,18 @@ while(<STDIN>) {
         @lineTokens = map { if(/[a-z]/) { $_ } else { my @t = /(.)/g; @t } } @lineTokens;
     }
 
-    # only use words that are not present in the source or that are frequent in the target language despite that
+    # if a source file is present discard infrequent copies
     if(@source) {
-        @lineTokens = grep { exists($frequent{$_}) or not exists($source[$. - 1]->{$_}) } @lineTokens;
+        # only use words that are not present in the source or that are frequent in the target language despite that
+        # print join("\n", grep { !exists($frequent{$_}) and exists($source[$. - 1]->{$_}) } @lineTokens), "\n";
+        @lineTokens = map { (exists($frequent{$_}) or not exists($source[$. - 1]->{$_})) ? $_ : "<COPY>" } @lineTokens;
     }
 
-    # only use words that are seen in the frequency list with occurance 5 and above
+    # if a word count file is available discard very rare words
     if(%words) { 
-        @lineTokens = grep { exists($words{$_}) } @lineTokens;
+        # only use words that are seen in the frequency list with occurance 5 and above
+        #print join("\n", grep { !exists($words{$_}) } @lineTokens), "\n";
+        @lineTokens = map { exists($words{$_}) ? $_ : "<UNK>" } @lineTokens;
     }
 
     push(@tokens, @lineTokens);

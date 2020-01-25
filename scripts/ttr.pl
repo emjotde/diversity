@@ -54,15 +54,15 @@ while(<STDIN>) {
     if(@source) {
         # only use words that are not present in the source or that are frequent in the target language despite that
         # print join("\n", grep { !exists($frequent{$_}) and exists($source[$. - 1]->{$_}) } @lineTokens), "\n";
-        @lineTokens = grep { exists($frequent{$_}) or not exists($source[$. - 1]->{$_}) } @lineTokens;
+        @lineTokens = map { (exists($frequent{$_}) or not exists($source[$. - 1]->{$_})) ? $_ : "<COPY>" } @lineTokens;
 
     }
 
     # if a word count file is available discard very rare words
     if(%words) { 
         # only use words that are seen in the frequency list with occurance 5 and above
-        print join("\n", grep { !exists($words{$_}) } @lineTokens), "\n";
-        @lineTokens = grep { exists($words{$_}) } @lineTokens;
+        #print join("\n", grep { !exists($words{$_}) } @lineTokens), "\n";
+        @lineTokens = map { exists($words{$_}) ? $_ : "<UNK>" } @lineTokens;
     }
 
     foreach my $t (@lineTokens) {
