@@ -48,4 +48,9 @@ for i in range(len(labels)):
     else:
         axes[x, y].yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
 
+if "mtld" in sys.argv[1]:
+    fig.suptitle("Lexical diversity of WMT19 systems measured with MTLD", y=1.02)
+if "ttr" in sys.argv[1]:
+    fig.suptitle("Lexical diversity of WMT19 systems measured with TTR", y=1.02)
+
 fig.savefig(sys.argv[1], bbox_inches='tight')

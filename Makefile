@@ -6,6 +6,8 @@ TGT=en
 
 .PHONY: clean
 
+.PRECIOUS: %.txt
+
 all: plots
 
 download/wmt19-submitted-data-v3-txt-minimal.tgz : 

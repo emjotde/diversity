@@ -23,8 +23,6 @@ if(defined($WORDS) and $LANG eq "en") {
         }
     }
     close(W);
-} else {
-    print STDERR "Not using word list for target language other than English"
 }
 
 my @source;

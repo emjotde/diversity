@@ -56,11 +56,21 @@ for i in range(len(labels)):
     if i in ref:
         axes[x, y].scatter(x=[ref[i][0]], y=[ref[i][1]], c="red")
 
-    axes[x, y].set_xlabel(labels[i])
+    r, p = stats.pearsonr(dataAll[i][0], dataAll[i][1])
+
+    axes[x, y].set_xlabel(labels[i] + "   rho=%.2f" % (r,))
     if mtld:
         axes[x, y].yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
     else:
         axes[x, y].yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-    
+
+r, p = stats.pearsonr(sum([l[0] for l in dataAll], []), sum([l[1] for l in dataAll], []))
+
+if "mtld" in sys.argv[1]:
+    title = "MTLD"
+elif "ttr" in sys.argv[1]:
+    title = "TTR"
+
+fig.suptitle("Correlation between human judgements and lexical diversity of WMT19 systems measured with %s: overall rho=%.2f" % (title, r), y=1.02)
 
 fig.savefig(sys.argv[1], bbox_inches='tight')

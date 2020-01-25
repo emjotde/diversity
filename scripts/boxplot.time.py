@@ -12,6 +12,7 @@ human   = []
 labels  = []
 
 mtld = False
+fw   = True
 yy = 15
 
 for path in sys.argv[2:]:
@@ -20,6 +21,8 @@ for path in sys.argv[2:]:
     yy += 1
     if "mtld" in path:
         mtld = True
+    if "bw" in path:
+        fw = False
     with open(path) as file:
         data = []
         for line in file:
@@ -45,5 +48,17 @@ if mtld:
     ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
 else:
     ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+
+if mtld:
+    ld = "MTLD"
+else:
+    ld = "TTR"
+
+if fw:
+    direction = "correct"
+else:
+    direction = "inverse"
+
+fig.suptitle("Lexical diversity of WMT systems measured with %s over time (%s direction)" % (ld, direction), y=1.02)
 
 fig.savefig(sys.argv[1], bbox_inches='tight')
