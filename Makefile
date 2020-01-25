@@ -6,6 +6,8 @@ TGT=en
 
 .PHONY: clean
 
+.PRECIOUS: %.txt
+
 all: plots
 
 download/wmt19-submitted-data-v3-txt-minimal.tgz : 
@@ -222,21 +224,21 @@ data/wmt18/$(SRC)-$(TGT)/newstest2018.HUMAN.$(SRC)-$(TGT) : download/wmt18-submi
 
 #############################################################################################
 
-results/newstest2015-$(SRC)$(TGT)-src.$(SRC).fw : download/wmt15-submitted-data/txt/sources/newstest2015-$(SRC)$(TGT)-src.$(SRC) splits/wmt15.$(SRC)$(TGT).split
+results/newstest2015-$(SRC)$(TGT)-src.$(SRC).fw : splits/wmt15.$(SRC)$(TGT).split download/wmt15-submitted-data/done
 	$(DIR_GUARD)
-	paste $(word 2, $^) $(word 1, $^) | grep '^True' | cut -f 2 > $@
+	paste $< download/wmt15-submitted-data/txt/sources/newstest2015-$(SRC)$(TGT)-src.$(SRC) | grep '^True' | cut -f 2 > $@
 
-results/newstest2016-$(SRC)$(TGT)-src.$(SRC).fw : download/wmt16-submitted-data/txt/sources/newstest2016-$(SRC)$(TGT)-src.$(SRC) splits/wmt16.$(SRC)$(TGT).split
+results/newstest2016-$(SRC)$(TGT)-src.$(SRC).fw : splits/wmt16.$(SRC)$(TGT).split download/wmt16-submitted-data/done
 	$(DIR_GUARD)
-	paste $(word 2, $^) $(word 1, $^) | grep '^True' | cut -f 2 > $@
+	paste $< download/wmt16-submitted-data/txt/sources/newstest2016-$(SRC)$(TGT)-src.$(SRC) | grep '^True' | cut -f 2 > $@
 
-results/newstest2017-$(SRC)$(TGT)-src.$(SRC).fw : download/wmt17-submitted-data/txt/sources/newstest2017-$(SRC)$(TGT)-src.$(SRC) splits/wmt17.$(SRC)$(TGT).split
+results/newstest2017-$(SRC)$(TGT)-src.$(SRC).fw : splits/wmt17.$(SRC)$(TGT).split download/wmt17-submitted-data/done
 	$(DIR_GUARD)
-	paste $(word 2, $^) $(word 1, $^) | grep '^True' | cut -f 2 > $@
+	paste $< download/wmt17-submitted-data/txt/sources/newstest2017-$(SRC)$(TGT)-src.$(SRC) | grep '^True' | cut -f 2 > $@
 
-results/newstest2018-$(SRC)$(TGT)-src.$(SRC).fw : download/wmt18-submitted-data/txt/sources/newstest2018-$(SRC)$(TGT)-src.$(SRC) splits/wmt18.$(SRC)$(TGT).split
+results/newstest2018-$(SRC)$(TGT)-src.$(SRC).fw : splits/wmt18.$(SRC)$(TGT).split download/wmt18-submitted-data/done
 	$(DIR_GUARD)
-	paste $(word 2, $^) $(word 1, $^) | grep '^True' | cut -f 2 > $@
+	paste $< download/wmt18-submitted-data/txt/sources/newstest2018-$(SRC)$(TGT)-src.$(SRC) | grep '^True' | cut -f 2 > $@
 
 results/wmt15.$(SRC)-$(TGT).%.fw.txt : splits/wmt15.$(SRC)$(TGT).split data/wmt15/$(SRC)-$(TGT) data/wmt15/$(SRC)-$(TGT)/newstest2015.HUMAN.$(SRC)-$(TGT) results/newstest2015-$(SRC)$(TGT)-src.$(SRC).fw
 	$(DIR_GUARD)
@@ -277,21 +279,21 @@ results/wmt18.$(SRC)-$(TGT).%.fw.txt : splits/wmt18.$(SRC)$(TGT).split data/wmt1
 #############################################################################################
 # in wrong direction, reference is native text, via grep -v
 
-results/newstest2015-$(SRC)$(TGT)-src.$(SRC).bw : download/wmt15-submitted-data/txt/sources/newstest2015-$(SRC)$(TGT)-src.$(SRC) splits/wmt15.$(SRC)$(TGT).split
+results/newstest2015-$(SRC)$(TGT)-src.$(SRC).bw : splits/wmt15.$(SRC)$(TGT).split download/wmt15-submitted-data/done
 	$(DIR_GUARD)
-	paste $(word 2, $^) $(word 1, $^) | grep -v '^True' | cut -f 2 > $@
+	paste $< download/wmt15-submitted-data/txt/sources/newstest2015-$(SRC)$(TGT)-src.$(SRC)  | grep -v '^True' | cut -f 2 > $@
 
-results/newstest2016-$(SRC)$(TGT)-src.$(SRC).bw : download/wmt16-submitted-data/txt/sources/newstest2016-$(SRC)$(TGT)-src.$(SRC) splits/wmt16.$(SRC)$(TGT).split
+results/newstest2016-$(SRC)$(TGT)-src.$(SRC).bw : splits/wmt16.$(SRC)$(TGT).split download/wmt16-submitted-data/done
 	$(DIR_GUARD)
-	paste $(word 2, $^) $(word 1, $^) | grep -v '^True' | cut -f 2 > $@
+	paste $< download/wmt16-submitted-data/txt/sources/newstest2016-$(SRC)$(TGT)-src.$(SRC)  | grep -v '^True' | cut -f 2 > $@
 
-results/newstest2017-$(SRC)$(TGT)-src.$(SRC).bw : download/wmt17-submitted-data/txt/sources/newstest2017-$(SRC)$(TGT)-src.$(SRC) splits/wmt17.$(SRC)$(TGT).split
+results/newstest2017-$(SRC)$(TGT)-src.$(SRC).bw : splits/wmt17.$(SRC)$(TGT).split download/wmt17-submitted-data/done
 	$(DIR_GUARD)
-	paste $(word 2, $^) $(word 1, $^) | grep -v '^True' | cut -f 2 > $@
+	paste $< download/wmt17-submitted-data/txt/sources/newstest2017-$(SRC)$(TGT)-src.$(SRC) | grep -v '^True' | cut -f 2 > $@
 
-results/newstest2018-$(SRC)$(TGT)-src.$(SRC).bw : download/wmt18-submitted-data/txt/sources/newstest2018-$(SRC)$(TGT)-src.$(SRC) splits/wmt18.$(SRC)$(TGT).split
+results/newstest2018-$(SRC)$(TGT)-src.$(SRC).bw : splits/wmt18.$(SRC)$(TGT).split download/wmt18-submitted-data/done
 	$(DIR_GUARD)
-	paste $(word 2, $^) $(word 1, $^) | grep -v '^True' | cut -f 2 > $@
+	paste $< download/wmt18-submitted-data/txt/sources/newstest2018-$(SRC)$(TGT)-src.$(SRC) | grep -v '^True' | cut -f 2 > $@
 
 results/wmt15.$(SRC)-$(TGT).%.bw.txt : splits/wmt15.$(SRC)$(TGT).split data/wmt15/$(SRC)-$(TGT) data/wmt15/$(SRC)-$(TGT)/newstest2015.HUMAN.$(SRC)-$(TGT) results/newstest2015-$(SRC)$(TGT)-src.$(SRC).bw
 	$(DIR_GUARD)

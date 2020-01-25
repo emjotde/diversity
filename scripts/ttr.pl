@@ -9,14 +9,13 @@ my $SOURCE = $ARGV[2];
 
 my %words;
 my %frequent;
-
-#if(defined($WORDS) and $LANG eq "en") {
-if(defined($WORDS)) {
+    
+if(defined($WORDS) and $LANG eq "en") {
     open(W, "<:utf8", $WORDS);
     while(<W>) {
         chomp;
         my ($w, $c) = split(/\t/, $_);
-        if($c >= 1) {
+        if($c >= 5) {
             $words{$w} = 1;
         }
         if($c > 1000) {
